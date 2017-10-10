@@ -2,8 +2,32 @@ var querystring = require('querystring'),
   url = require('url');
 
 var routes = {
-  '/get_date': getDate
+  '/get_date': getDate,
+  '/login': loginForm
 };
+
+function loginForm(request, response) {
+  if (request.method == 'POST') {
+    var body = '';
+
+    request.on('data', function(data) {
+      body += data;
+
+      // Too much POST data, kill the connection!
+      // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
+      if (body.length > 1e6)
+        request.connection.destroy();
+    });
+
+    request.on('end', function() {
+      var post = querystring.parse(body);
+      // use post['blah'], etc.
+    });
+
+    response = post;
+    return response;
+  }
+}
 
 function getDate() {
   var datetime = new Date();
@@ -13,12 +37,12 @@ function getDate() {
   };
 }
 
-exports.apiCall = function (request, response, filename) {
+exports.apiCall = function(request, response, filename) {
   var body = '';
 
   console.log('---------------------');
 
-  request.on('data', function (data) {
+  request.on('data', function(data) {
     body += data;
 
     // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
@@ -34,11 +58,17 @@ exports.apiCall = function (request, response, filename) {
     console.log('GET data: ', url.parse(request.url, true).query);
 
     if (typeof routes[request.url] !== 'undefined') {
-      response.writeHead(200, { 'Content-Type': 'application/json' });
+      response.writeHead(200, {
+        'Content-Type': 'application/json'
+      });
       response.end(JSON.stringify(routes[request.url]()));
     } else {
-      response.writeHead(501, { 'Content-Type': 'application/json' });
-      response.end(JSON.stringify({ message: 'not implemented' }));
+      response.writeHead(501, {
+        'Content-Type': 'application/json'
+      });
+      response.end(JSON.stringify({
+        message: 'not implemented'
+      }));
     }
   });
 };
