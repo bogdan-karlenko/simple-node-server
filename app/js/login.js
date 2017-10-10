@@ -12,7 +12,9 @@ function sendRequest() {
     if (xhr.readyState !== 4) {
       return
     } else {
-      console.log(xhr.responseText);
+      if (xhr.responseText === '"OK"') {
+        window.location = "/admin.html";
+      }
     }
   };
 }

@@ -18,4 +18,5 @@ console.log(
   'Static file server running at\n' +
   '  => http://localhost:' + port + '\n' +
   'CTRL + C to shutdown'
+  // serveRest.post
 );

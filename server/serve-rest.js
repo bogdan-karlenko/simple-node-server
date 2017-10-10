@@ -6,28 +6,7 @@ var routes = {
   '/login': loginForm
 };
 
-function loginForm(request, response) {
-  if (request.method == 'POST') {
-    var body = '';
-
-    request.on('data', function(data) {
-      body += data;
-
-      // Too much POST data, kill the connection!
-      // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
-      if (body.length > 1e6)
-        request.connection.destroy();
-    });
-
-    request.on('end', function() {
-      var post = querystring.parse(body);
-      // use post['blah'], etc.
-    });
-
-    response = post;
-    return response;
-  }
-}
+var post = {};
 
 function getDate() {
   var datetime = new Date();
@@ -35,6 +14,22 @@ function getDate() {
   return {
     currentDate: datetime
   };
+}
+
+function loginForm() {
+  if (post.login === 'admin' && post.password === 'admin') {
+    return 'OK'
+  } else {
+    return 'notOK'
+  }
+}
+
+function adminLogin(login, password) {
+  if (login === 'admin' && passord === 'admin') {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 exports.apiCall = function(request, response, filename) {
@@ -57,6 +52,8 @@ exports.apiCall = function(request, response, filename) {
     console.log('POST data: ', querystring.parse(body));
     console.log('GET data: ', url.parse(request.url, true).query);
 
+    post = querystring.parse(body);
+
     if (typeof routes[request.url] !== 'undefined') {
       response.writeHead(200, {
         'Content-Type': 'application/json'
@@ -72,3 +69,6 @@ exports.apiCall = function(request, response, filename) {
     }
   });
 };
+
+
+console.log(post);
